@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banay</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      html,
+      body {
+        margin: 0px;
+      }
+
+      .container {
+        border: 1px solid black;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table th,
+      .table td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body style="margin-right: 0">
+    <div id="container" class="container">
+      <table id="table" class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+
+      <form id="formAddUser">
+        <input type="text" id="inputName" placeholder="Name" />
+        <input type="text" id="inputAge" placeholder="Age" />
+        <input type="text" id="inputAddress" placeholder="Address" />
+
+        <button type="button" onclick="addUser()">Add User</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    // Local array that stores the users (currently NOT connected to the API/database)
+    const json = [
+      {
+        name: "John",
+        age: 20,
+        address: "Jaro",
+      },
+    ];
+
+    // When the page finishes loading, render the table
+    window.onload = function () {
+      loadData();
+    };
+
+    // Edit a user: asks for new values with prompt() dialogs
+    function editUser(index) {
+      const user = json[index];
+      // Get the user object at the given index
+
+        const newName = prompt("Edit Name:", user.name);
+        const newAge = prompt("Edit Age:", user.age);
+        const newAddress = prompt("Edit Address:", user.address);
+        // Each prompt is pre-filled with the current value
+
+        if (!newName || !newAge || !newAddress) {
+        alert("All fields are required!");
+        return;
+        // If any field is empty/cancelled, stop and warn the user
+        }
+
+        json[index] = {
+        name: newName,
+        age: newAge,
+        address: newAddress,
+        };
+        // Replace the old user object with the updated one
+
+        loadData();
+        // Re-render the table so the changes show up
+    }
+
+    // Delete a user: removes the item at that index
+    function deleteUser(index) {
+      json.splice(index, 1);
+      // splice(index, 1) removes exactly 1 element at "index"
+      loadData();
+      // Re-render the table
+    }
+
+    // Add a user: reads the form inputs and appends them to the array
+    function addUser() {
+      const inputName = document.getElementById("inputName");
+      const inputAge = document.getElementById("inputAge");
+      const inputAddress = document.getElementById("inputAddress");
+      // Get references to the three input boxes
+
+      if (!inputName.value || !inputAge.value || !inputAddress.value) {
+        alert("All fields are required!");
+        return;
+        // Block submission if any field is blank
+      }
+
+      const postData = {
+        name: inputName.value,
+        age: inputAge.value,
+        address: inputAddress.value,
+      };
+      // Package the input values into an object
+
+      json.push(postData);
+      // Append the new user to the end of the array
+
+      loadData();
+      // Re-render the table
+
+      const formAddUser = document.getElementById("formAddUser");
+      formAddUser.reset();
+      // Clear the form fields for the next entry
+    }
+
+    const table = document.querySelector("#table");
+    // Selects the table element (declared but not used elsewhere)
+
+    // Renders every user in the array as table rows
+    function loadData() {
+      const tableBody = document.getElementById("table-body");
+      // The <tbody> that will hold the rows
+      let html = "";
+      // Empty string that accumulates the HTML markup
+
+      for (let i = 0; i < json.length; i++) {
+        // Loop through each user in the array
+        html += `<tr>
+                    <td>${json[i].name}</td>
+                    <td>${json[i].age}</td>
+                    <td>${json[i].address}</td>
+                    <td>
+                      <button type="button" onclick="editUser('${i}')">
+                        Edit User
+                      </button>
+                      <button type="button" onclick="deleteUser('${i}')">
+                        Delete User
+                      </button>
+                    </td>
+                 </tr>`;
+        // Build a table row with the user's data + Edit/Delete buttons
+        // The index "i" is passed to the button functions so they know which row
+      }
+
+      tableBody.innerHTML = html;
+      // Insert the generated HTML into the table body
+    }
+  </script>
+</html>
